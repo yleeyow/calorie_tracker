@@ -154,6 +154,18 @@ input:focus{outline:none;color:var(--under)}
 }
 .addmeal:active{border-style:solid}
 
+#mSearch{
+  width:100%;text-align:left;box-sizing:border-box;
+  background:var(--none);border:1.5px solid transparent;border-radius:10px;
+  padding:11px 12px;margin-bottom:6px;
+  color:var(--ink);font:400 15px/1 ui-rounded,sans-serif;
+}
+#mSearch:focus{outline:none;border-color:var(--rule);color:var(--ink)}
+#mSearch::-webkit-search-cancel-button{-webkit-appearance:none;height:15px;width:15px;
+  background:var(--muted);border-radius:50%;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5 5l10 10M15 5L5 15' stroke='black' stroke-width='2.5' stroke-linecap='round'/></svg>") center/11px no-repeat;
+  cursor:pointer}
+
 /* meal index */
 #mealSheet{z-index:7}
 .mhead{display:flex;align-items:baseline;justify-content:space-between}
@@ -318,6 +330,8 @@ textarea:focus{outline:none;border-color:var(--muted)}
   </div>
   <div class="sub" id="mealSub"></div>
 
+  <input type="search" id="mSearch" placeholder="Search meals" autocapitalize="none" autocorrect="off" hidden>
+
   <div id="mealList"></div>
 
   <div class="newlabel">New meal</div>
@@ -454,12 +468,26 @@ function macroLine(m){
   return `${m.kcal||0} kcal` + (p.length?` · ${p.join(' ')}`:'');
 }
 
+const SEARCH_AT=6;   // only show the field once the list is worth searching
+
 function renderIndex(){
-  const w=$('mealList');
+  const w=$('mealList'), box=$('mSearch');
+  box.hidden = meals.length < SEARCH_AT;
+  if(box.hidden) box.value='';
+
   if(!meals.length){w.innerHTML='<div class="empty">No meals saved yet.</div>';return}
+
+  const q=box.value.trim().toLowerCase();
+  const shown = q ? meals.filter(m=>m.name.toLowerCase().includes(q)) : meals;
+
+  if(!shown.length){
+    w.innerHTML=`<div class="empty">No meals match “${esc(box.value.trim())}”.</div>`;
+    return;
+  }
+
   w.innerHTML='';
   const adding = mealMode==='add';
-  meals.forEach((m,i)=>{
+  shown.forEach(m=>{
     const row=document.createElement('div'); row.className='mrow';
     const main=document.createElement(adding?'button':'div');
     main.className='madd'+(adding?'':' static');
@@ -467,13 +495,21 @@ function renderIndex(){
     if(adding) main.onclick=()=>addFromIndex(m);
     const del=document.createElement('button'); del.className='mdel'; del.textContent='×';
     del.setAttribute('aria-label','Delete meal');
-    del.onclick=()=>{ if(confirm(`Delete "${m.name}" from your meals?`)){meals.splice(i,1);save(M,meals);renderIndex()} };
+    // Splice by identity, not by rendered position — when filtered, the row
+    // index no longer matches the index in `meals`.
+    del.onclick=()=>{
+      if(!confirm(`Delete "${m.name}" from your meals?`)) return;
+      const at=meals.indexOf(m);
+      if(at>-1) meals.splice(at,1);
+      save(M,meals); renderIndex();
+    };
     row.append(main,del); w.appendChild(row);
   });
 }
 
 function openMeals(mode){
   mealMode=mode;
+  $('mSearch').value='';
   $('mealSub').textContent = mode==='add'
     ? 'Tap a meal to add it to the day.'
     : 'Your saved meals.';
@@ -486,6 +522,7 @@ function closeMeals(){
   if(!$('daySheet').classList.contains('open')) $('scrim').classList.remove('open');
 }
 
+$('mSearch').oninput=()=>renderIndex();
 $('mealsBtn').onclick=()=>openMeals('manage');
 $('addMeal').onclick=()=>openMeals('add');
 $('mDone').onclick=closeMeals;
@@ -498,6 +535,7 @@ $('mSave').onclick=()=>{
   meals.sort((a,b)=>a.name.localeCompare(b.name));
   save(M,meals);
   ['mName','mK','mP','mC','mF','mS'].forEach(id=>$(id).value='');
+  $('mSearch').value='';
   renderIndex();
   $('mealSheet').scrollTo({top:0,behavior:'smooth'});
 };
