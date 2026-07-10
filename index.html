@@ -166,6 +166,23 @@ input:focus{outline:none;color:var(--under)}
   -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5 5l10 10M15 5L5 15' stroke='black' stroke-width='2.5' stroke-linecap='round'/></svg>") center/11px no-repeat;
   cursor:pointer}
 
+/* per-row quantity stepper */
+.qty{display:flex;align-items:center;gap:2px;flex:none;align-self:center}
+.qbtn{
+  width:30px;height:30px;border-radius:8px;flex:none;
+  border:1.5px solid var(--rule);background:none;color:var(--ink);
+  font:400 17px/1 ui-rounded,sans-serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.qbtn:disabled{opacity:.25;cursor:default}
+.qbtn:not(:disabled):active{background:var(--ink);color:var(--paper)}
+.qn{
+  min-width:20px;text-align:center;
+  font:500 14px/1 ui-rounded,sans-serif;color:var(--ink);
+}
+.qty:not(.on) .qn{color:var(--muted)}
+.mchip i{font-style:normal;font-weight:500;color:var(--ink);font-size:12px}
+
 /* meal index */
 #mealSheet{z-index:7}
 .mhead{display:flex;align-items:baseline;justify-content:space-between}
@@ -439,28 +456,49 @@ function bump(id,delta){
   const v=Math.max(0,r2(cur+delta));
   el.value = (v===0&&delta<0) ? '' : v;
 }
-function applyMeal(m,sign){
-  bump('kcal',sign*(m.kcal||0)); bump('pro',sign*(m.pro||0));
-  bump('carb',sign*(m.carb||0)); bump('fat',sign*(m.fat||0)); bump('sod',sign*(m.sod||0));
+// n may be any integer: +2 adds two servings, -1 removes one.
+function applyMeal(m,n){
+  bump('kcal',n*(m.kcal||0)); bump('pro',n*(m.pro||0));
+  bump('carb',n*(m.carb||0)); bump('fat',n*(m.fat||0)); bump('sod',n*(m.sod||0));
 }
 
 function renderChips(){
   const w=$('mealChips'); w.innerHTML='';
   pending.forEach((m,i)=>{
+    const q=m.qty||1;
     const c=document.createElement('button');
     c.className='mchip';
-    c.innerHTML=`${esc(m.name)} <b>${m.kcal||0}</b> <span>×</span>`;
+    c.innerHTML=`${esc(m.name)}${q>1?` <i>×${q}</i>`:''} <b>${r2((m.kcal||0)*q)}</b> <span>×</span>`;
     c.title='Remove';
-    c.onclick=()=>{applyMeal(m,-1);pending.splice(i,1);renderChips()};
+    c.onclick=()=>{applyMeal(m,-q);pending.splice(i,1);renderChips();
+      if($('mealSheet').classList.contains('open')) renderIndex();};
     w.appendChild(c);
   });
 }
 
-function addFromIndex(m){
-  const snap={name:m.name,kcal:m.kcal||0,pro:m.pro||0,carb:m.carb||0,fat:m.fat||0,sod:m.sod||0};
-  pending.push(snap); applyMeal(snap,1);
-  if(snap.pro||snap.carb||snap.fat||snap.sod) openMacros();
-  renderChips(); closeMeals();
+// How many of meal `m` are currently on the day. Entries saved before
+// quantities existed have no `qty`, so a missing value means one.
+const qtyOf=m=>{const e=pending.find(p=>p.name===m.name); return e?(e.qty||1):0};
+
+function setQty(m,n){
+  n=Math.max(0,Math.min(99,n));
+  const i=pending.findIndex(p=>p.name===m.name);
+  const had=i>-1?(pending[i].qty||1):0;
+  const diff=n-had;
+  if(!diff) return;
+
+  // Scale by the values already logged for this day, not by the current
+  // index entry — the meal's definition may have changed since.
+  const src = i>-1 ? pending[i] : m;
+
+  if(n===0){ pending.splice(i,1); }
+  else if(i>-1){ pending[i].qty=n; }
+  else pending.push({name:m.name,kcal:m.kcal||0,pro:m.pro||0,carb:m.carb||0,fat:m.fat||0,sod:m.sod||0,qty:n});
+
+  applyMeal(src,diff);                     // add or remove `diff` servings
+  if(diff>0 && (src.pro||src.carb||src.fat||src.sod)) openMacros();
+  renderChips();
+  if($('mealSheet').classList.contains('open')) renderIndex();
 }
 
 function macroLine(m){
@@ -492,18 +530,42 @@ function renderIndex(){
     const main=document.createElement(adding?'button':'div');
     main.className='madd'+(adding?'':' static');
     main.innerHTML=`<span class="mn">${esc(m.name)}</span><span class="mk">${macroLine(m)}</span>`;
-    if(adding) main.onclick=()=>addFromIndex(m);
-    const del=document.createElement('button'); del.className='mdel'; del.textContent='×';
-    del.setAttribute('aria-label','Delete meal');
-    // Splice by identity, not by rendered position — when filtered, the row
-    // index no longer matches the index in `meals`.
-    del.onclick=()=>{
-      if(!confirm(`Delete "${m.name}" from your meals?`)) return;
-      const at=meals.indexOf(m);
-      if(at>-1) meals.splice(at,1);
-      save(M,meals); renderIndex();
-    };
-    row.append(main,del); w.appendChild(row);
+
+    if(adding){
+      const q=qtyOf(m);
+      main.onclick=()=>setQty(m,q+1);          // tapping the row adds one
+      row.append(main);
+
+      const qc=document.createElement('div'); qc.className='qty'+(q?' on':'');
+      const minus=document.createElement('button');
+      minus.className='qbtn'; minus.textContent='−';
+      minus.setAttribute('aria-label',`One fewer ${m.name}`);
+      minus.disabled=!q;
+      minus.onclick=e=>{e.stopPropagation();setQty(m,q-1)};
+
+      const n=document.createElement('span'); n.className='qn'; n.textContent=q||'';
+
+      const plus=document.createElement('button');
+      plus.className='qbtn'; plus.textContent='+';
+      plus.setAttribute('aria-label',`One more ${m.name}`);
+      plus.onclick=e=>{e.stopPropagation();setQty(m,q+1)};
+
+      qc.append(minus,n,plus); row.append(qc);
+    } else {
+      row.append(main);
+      const del=document.createElement('button'); del.className='mdel'; del.textContent='×';
+      del.setAttribute('aria-label','Delete meal');
+      // Splice by identity, not by rendered position — when filtered, the row
+      // index no longer matches the index in `meals`.
+      del.onclick=()=>{
+        if(!confirm(`Delete "${m.name}" from your meals?`)) return;
+        const at=meals.indexOf(m);
+        if(at>-1) meals.splice(at,1);
+        save(M,meals); renderIndex();
+      };
+      row.append(del);
+    }
+    w.appendChild(row);
   });
 }
 
