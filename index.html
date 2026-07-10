@@ -230,7 +230,7 @@ textarea:focus{outline:none;border-color:var(--muted)}
 
   <div class="row">
     <label for="kcal">Calories</label>
-    <input type="number" id="kcal" inputmode="numeric" placeholder="0">
+    <input type="number" id="kcal" inputmode="decimal" step="any" min="0" placeholder="0">
     <span class="denom" id="kcalGoal"></span>
   </div>
 
@@ -238,22 +238,22 @@ textarea:focus{outline:none;border-color:var(--muted)}
   <div class="macros" id="macros">
     <div class="row">
       <label for="pro">Protein</label>
-      <input type="number" id="pro" inputmode="numeric" placeholder="0">
+      <input type="number" id="pro" inputmode="decimal" step="any" min="0" placeholder="0">
       <span class="denom" id="proGoal"></span>
     </div>
     <div class="row">
       <label for="carb">Carbs</label>
-      <input type="number" id="carb" inputmode="numeric" placeholder="0">
+      <input type="number" id="carb" inputmode="decimal" step="any" min="0" placeholder="0">
       <span class="denom" id="carbGoal"></span>
     </div>
     <div class="row">
       <label for="fat">Fat</label>
-      <input type="number" id="fat" inputmode="numeric" placeholder="0">
+      <input type="number" id="fat" inputmode="decimal" step="any" min="0" placeholder="0">
       <span class="denom" id="fatGoal"></span>
     </div>
     <div class="row">
       <label for="sod">Sodium</label>
-      <input type="number" id="sod" inputmode="numeric" placeholder="0">
+      <input type="number" id="sod" inputmode="decimal" step="any" min="0" placeholder="0">
       <span class="denom" id="sodGoal"></span>
     </div>
   </div>
@@ -261,7 +261,7 @@ textarea:focus{outline:none;border-color:var(--muted)}
   <div class="row water">
     <label for="water">Water</label>
     <button class="step" id="wDown" aria-label="Remove a cup">−</button>
-    <input type="number" id="water" inputmode="numeric" placeholder="0">
+    <input type="number" id="water" inputmode="decimal" step="any" min="0" placeholder="0">
     <button class="step" id="wUp" aria-label="Add a cup">+</button>
     <span class="denom" id="waterGoal"></span>
   </div>
@@ -290,13 +290,13 @@ textarea:focus{outline:none;border-color:var(--muted)}
   <h2>Goals</h2>
   <div class="sub">Daily targets. Leave blank to hide.</div>
 
-  <div class="row"><label for="gk">Calories</label><input type="number" id="gk" inputmode="numeric" placeholder="—"><span class="unit">kcal</span></div>
-  <div class="row"><label for="gp">Protein</label><input type="number" id="gp" inputmode="numeric" placeholder="—"><span class="unit">g</span></div>
-  <div class="row"><label for="gc">Carbs</label><input type="number" id="gc" inputmode="numeric" placeholder="—"><span class="unit">g</span></div>
-  <div class="row"><label for="gf">Fat</label><input type="number" id="gf" inputmode="numeric" placeholder="—"><span class="unit">g</span></div>
-  <div class="row"><label for="gs">Sodium</label><input type="number" id="gs" inputmode="numeric" placeholder="—"><span class="unit">mg</span></div>
-  <div class="row"><label for="gw">Water</label><input type="number" id="gw" inputmode="numeric" placeholder="—"><span class="unit">cups</span></div>
-  <div class="row"><label for="gt">On-target window</label><input type="number" id="gt" inputmode="numeric" placeholder="10"><span class="unit">%</span></div>
+  <div class="row"><label for="gk">Calories</label><input type="number" id="gk" inputmode="decimal" step="any" min="0" placeholder="—"><span class="unit">kcal</span></div>
+  <div class="row"><label for="gp">Protein</label><input type="number" id="gp" inputmode="decimal" step="any" min="0" placeholder="—"><span class="unit">g</span></div>
+  <div class="row"><label for="gc">Carbs</label><input type="number" id="gc" inputmode="decimal" step="any" min="0" placeholder="—"><span class="unit">g</span></div>
+  <div class="row"><label for="gf">Fat</label><input type="number" id="gf" inputmode="decimal" step="any" min="0" placeholder="—"><span class="unit">g</span></div>
+  <div class="row"><label for="gs">Sodium</label><input type="number" id="gs" inputmode="decimal" step="any" min="0" placeholder="—"><span class="unit">mg</span></div>
+  <div class="row"><label for="gw">Water</label><input type="number" id="gw" inputmode="decimal" step="any" min="0" placeholder="—"><span class="unit">cups</span></div>
+  <div class="row"><label for="gt">On-target window</label><input type="number" id="gt" inputmode="numeric" step="1" min="0" placeholder="10"><span class="unit">%</span></div>
 
   <div class="acts"><button class="btn save" id="saveGoals" style="flex:1">Save goals</button></div>
 
@@ -322,11 +322,11 @@ textarea:focus{outline:none;border-color:var(--muted)}
 
   <div class="newlabel">New meal</div>
   <input type="text" id="mName" placeholder="Name" autocapitalize="words">
-  <div class="row"><label for="mK">Calories</label><input type="number" id="mK" inputmode="numeric" placeholder="0"><span class="unit">kcal</span></div>
-  <div class="row"><label for="mP">Protein</label><input type="number" id="mP" inputmode="numeric" placeholder="0"><span class="unit">g</span></div>
-  <div class="row"><label for="mC">Carbs</label><input type="number" id="mC" inputmode="numeric" placeholder="0"><span class="unit">g</span></div>
-  <div class="row"><label for="mF">Fat</label><input type="number" id="mF" inputmode="numeric" placeholder="0"><span class="unit">g</span></div>
-  <div class="row"><label for="mS">Sodium</label><input type="number" id="mS" inputmode="numeric" placeholder="0"><span class="unit">mg</span></div>
+  <div class="row"><label for="mK">Calories</label><input type="number" id="mK" inputmode="decimal" step="any" min="0" placeholder="0"><span class="unit">kcal</span></div>
+  <div class="row"><label for="mP">Protein</label><input type="number" id="mP" inputmode="decimal" step="any" min="0" placeholder="0"><span class="unit">g</span></div>
+  <div class="row"><label for="mC">Carbs</label><input type="number" id="mC" inputmode="decimal" step="any" min="0" placeholder="0"><span class="unit">g</span></div>
+  <div class="row"><label for="mF">Fat</label><input type="number" id="mF" inputmode="decimal" step="any" min="0" placeholder="0"><span class="unit">g</span></div>
+  <div class="row"><label for="mS">Sodium</label><input type="number" id="mS" inputmode="decimal" step="any" min="0" placeholder="0"><span class="unit">mg</span></div>
 
   <div class="acts"><button class="btn save" id="mSave" style="flex:1">Save to meals</button></div>
 </div>
@@ -415,10 +415,14 @@ function openDay(date){
 /* ---- meals ---- */
 function openMacros(){$('macros').classList.add('show');$('disc').textContent='– Macros'}
 
+// Floats accumulate error: 0.1+0.2 = 0.30000000000000004. Round every
+// arithmetic result so adding then removing a meal returns to exactly empty.
+const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+
 function bump(id,delta){
   if(!delta) return;
   const el=$(id), cur=el.value===''?0:+el.value;
-  const v=Math.max(0,cur+delta);
+  const v=Math.max(0,r2(cur+delta));
   el.value = (v===0&&delta<0) ? '' : v;
 }
 function applyMeal(m,sign){
@@ -489,7 +493,8 @@ $('mDone').onclick=closeMeals;
 $('mSave').onclick=()=>{
   const name=$('mName').value.trim();
   if(!name){$('mName').focus();return}
-  meals.push({name,kcal:+$('mK').value||0,pro:+$('mP').value||0,carb:+$('mC').value||0,fat:+$('mF').value||0,sod:+$('mS').value||0});
+  const mv=id=>{const n=+$(id).value; return isFinite(n)?r2(n):0;};
+  meals.push({name,kcal:mv('mK'),pro:mv('mP'),carb:mv('mC'),fat:mv('mF'),sod:mv('mS')});
   meals.sort((a,b)=>a.name.localeCompare(b.name));
   save(M,meals);
   ['mName','mK','mP','mC','mF','mS'].forEach(id=>$(id).value='');
@@ -509,7 +514,7 @@ $('disc').onclick=()=>{
 };
 document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>c.classList.toggle('on'));
 
-const num=v=>v===''?null:+v;
+const num=v=>{ if(v==='') return null; const n=+v; return isFinite(n)?Math.max(0,r2(n)):null; };
 $('saveDay').onclick=()=>{
   const rec={
     kcal:num($('kcal').value), pro:num($('pro').value),
@@ -611,11 +616,11 @@ const dismiss={
 
 document.querySelectorAll('.sheet').forEach(sheet=>{
   const grab=sheet.querySelector('.grab');
-  let id=null, y0=0, t0=0, dy=0, lastY=0, lastT=0, vel=0;
+  let id=null, y0=0, dy=0, lastY=0, lastT=0, vel=0;
 
   grab.addEventListener('pointerdown',e=>{
     if(id!==null) return;
-    id=e.pointerId; y0=lastY=e.clientY; t0=lastT=e.timeStamp; dy=0; vel=0;
+    id=e.pointerId; y0=lastY=e.clientY; lastT=e.timeStamp; dy=0; vel=0;
     grab.setPointerCapture(id);
     sheet.classList.add('dragging');
     // only fade the scrim if nothing sits beneath this sheet
